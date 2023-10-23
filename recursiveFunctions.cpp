@@ -15,11 +15,18 @@ void fillArray(int[], int, int);
 void hanoiTowers(int, int start = 1, int end = 3);
 void startHanoiTowers();
 
+int moveKnight(int, int, int, int, int,
+	int[], int[], int**);
+void startMoveKnight();
+void printBoard(int**, int);
+
 int main()
 {
 	startFindMaxElem();
 
 	startHanoiTowers();
+
+	startMoveKnight();
 }
 
 
@@ -127,6 +134,8 @@ void startFindMaxElem() {
 
 	cout << endl;
 	cout << "max elem = " << maxElem << endl;
+
+	delete[] arr;
 }
 
 
@@ -187,4 +196,97 @@ void startHanoiTowers() {
 		hanoiTowers(countDisk);
 	}
 
+}
+
+
+void printBoard(int**board, int size) {
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			cout << board[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
+
+void startMoveKnight() {
+
+	int setMovesX[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+	int setMovesY[8] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+	int size;
+	cout << "Enter count of cells on board ";
+	cin >> size;
+
+	int** board = new int*[size];
+	for (int i = 0; i < size; i++)
+	{
+		board[i] = new int[size];
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			board[i][j] = 0;
+		}
+	}
+
+	int startX, startY;
+	cout << "Enter start possition" << endl;
+	cout << "x: "; cin >> startX;
+	cout << "y: "; cin >> startY;
+
+	board[startX][startY] = 1;
+	if (moveKnight(2, startX, startY, size, 8, setMovesX, setMovesY, board))
+	{
+		printBoard(board, size);
+	} 
+	else {
+		cout << "no solutions for this possition" << endl;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		delete[] board[i];
+	}
+	delete[] board;
+}
+
+int moveKnight(int i, int xPos, int yPos, int sizeBoard, int countSteps,
+	int setMovesX[], int setMovesY[], int** board) {
+
+	int nextX, nextY, indexInMoves = 0, q = 0;
+
+	while (q == 0 && indexInMoves < countSteps)
+	{
+		nextX = xPos + setMovesX[indexInMoves];
+		nextY = yPos + setMovesY[indexInMoves];
+		indexInMoves++;
+		if (nextX >= 0 && nextX < sizeBoard &&
+			nextY >= 0 && nextY < sizeBoard)
+		{
+			if (board[nextX][nextY] == 0)
+			{
+				board[nextX][nextY] = i;
+				cout << "next move this x = " << nextX << " y = " << nextY << endl;
+				printBoard(board, sizeBoard);
+				cout << endl;
+				int check = moveKnight(i + 1, nextX, nextY, sizeBoard, 8,
+					setMovesX, setMovesY, board);
+				if (i < sizeBoard * sizeBoard && check == 0)
+				{
+					board[nextX][nextY] = 0;
+					cout << "canceling a move with x = " << nextX << " y = " << nextY << endl;
+					printBoard(board, sizeBoard);
+					cout << endl;
+				}
+				else {
+					q = 1;
+				}
+			}
+		}
+	}
+	return q;
 }
